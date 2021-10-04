@@ -1,9 +1,9 @@
-import React from 'react';
+import React from 'react'
 import {
   ApolloClient,
   InMemoryCache,
   ApolloProvider,
-} from "@apollo/client";
+} from '@apollo/client'
 import Home from './components/Home'
 
 const client = new ApolloClient({

@@ -1,15 +1,13 @@
 import React from 'react'
-
-/**
- * Home Component
- *
- */
+import { Container } from './homepage-styles'
+import UserList from '../UserList'
 
 const Home = () => {
   return (
-    <div>
-      <h2>My first Apollo app 🚀</h2>
-    </div>
+    <Container>
+      <h1>GraphQL Demo 🚀</h1>
+      <UserList />
+    </Container>
   )
 }
 
