@@ -1,25 +1,13 @@
 import React, { useState } from 'react'
 import {
   useQuery,
-  useMutation,
-  gql
+  useMutation
 } from '@apollo/client'
-import { ListContainer, User, CloseIcon } from './userList-styles'
+import { loader } from 'graphql.macro'
+import { ListContainer, User, Name, CloseIcon } from './userList-styles'
 
-const USER_LIST_QUERY = gql`
-  query userListQuery {
-    users {
-      id
-      name
-    }
-  }
-`
-
-const DELETE_USER_MUTATION = gql`
-  mutation deletUserMutation($id: ID!) {
-    deleteUser(id: $id)
-  }
-`
+const USER_LIST_QUERY = loader('../../queries/userList.gql')
+const DELETE_USER_MUTATION = loader('../../queries/userDelete.gql')
 
 const UserList = () => {
   const { loading, error, data } = useQuery(USER_LIST_QUERY)
@@ -42,7 +30,7 @@ const UserList = () => {
           onMouseEnter={() => setShouldShowDelete(true)}
           onMouseLeave={() => setShouldShowDelete(false)}
         >
-          {name}
+          <Name>{name}</Name>
           {shouldShowDelete && ( 
             <div onClick={() => onDeleteUser({ variables: { id } })}>
               <CloseIcon size='24' />

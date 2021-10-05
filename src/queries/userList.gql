@@ -1,0 +1,7 @@
+query userListQuery {
+    users {
+      id
+      name
+    }
+  }
+  
