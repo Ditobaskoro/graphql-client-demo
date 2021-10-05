@@ -32,7 +32,7 @@ const resolvers = {
   },
   Mutation: {
     createUser: (parent, args, context, info) => {
-      const id = `user-${USERS.length+1}`
+      const id = `user-${(new Date()).getTime()}`
       USERS.push({ id, name: args.name })
       return "User added!"
     },
