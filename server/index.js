@@ -1,59 +1,39 @@
-const { ApolloServer } = require('apollo-server');
+const express = require("express")
+const { ApolloServer } = require("apollo-server-express")
+const firebase = require("firebase")
+const typeDefs = require("./typeDefs")
+const resolvers = require("./resolvers")
+require("dotenv").config()
 
-const USERS = [{
-  id: 'user-1',
-  name: 'john'
-}, {
-  id: 'user-2',
-  name: 'doe'
-}]
+const app = express()
 
-const typeDefs = `
-  type Query {
-    users: [User!]!
-    user(id: ID!): User
-  }
-
-  type Mutation {
-    createUser(name: String!): String
-    deleteUser(id: ID!): String
-  }
-  
-  type User {
-    id: ID!
-    name: String!
-  }
-`
-
-const resolvers = {
-  Query: {
-    users: () => USERS,
-    user: (parent, args, context, info) => USERS.filter(user => user.id === args.id)[0]
-  },
-  Mutation: {
-    createUser: (parent, args, context, info) => {
-      const id = `user-${(new Date()).getTime()}`
-      USERS.push({ id, name: args.name })
-      return "User added!"
-    },
-    deleteUser: (parent, args, context, info) => {
-      const index = USERS.findIndex(user => user.id === args.id)
-      if (index >= 0) {
-        USERS.splice(index, 1)
-        return "User deleted!"
-      }
-      return "User not found!"
-    }
-  }
-}
-
-const server = new ApolloServer({
-  typeDefs,
-  resolvers,
+const firebaseClient = firebase.initializeApp({
+  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
+  authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
+  databaseURL: process.env.REACT_APP_FIREBASE_DATABASE_URL,
+  projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID
 })
 
-server
-  .listen()
-  .then(({ url }) =>
-    console.log(`Server is running on ${url}`)
-  );
+let apolloServer = null
+
+async function startServer() {
+  apolloServer = new ApolloServer({
+    typeDefs,
+    resolvers,
+    context: ({ req }) => {
+      return {
+         headers: req.headers,
+         firebaseClient
+      }
+    }
+  })
+  await apolloServer.start()
+  apolloServer.applyMiddleware({ app })
+}
+
+startServer()
+
+app.listen({ port: 4000 }, () => {
+  console.log("Server has started 🚀 http://localhost:4000/graphql")
+  console.log(`gql path is ${apolloServer.graphqlPath}`)
+})
