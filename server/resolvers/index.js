@@ -1,18 +1,57 @@
-const fetch = require("node-fetch")
+require("dotenv").config()
+const firebase = require("../firebase")
 const userData = require("../functions/user.js")
-const baseURL = process.env.REACT_APP_FIREBASE_DATABASE_URL
+const { UserInputError } = require("apollo-server")
+
+const usersRef = firebase.database().ref('/users')
 
 const resolvers = {
   Query: {
     users: async () => {
-      const data = await fetch(`${baseURL}/users.json`)
-      const dataJson = await data.json()
-      const keys = Object.keys(dataJson)
-      const mapKeys = keys.map((item) => {
-        const data = dataJson[item]
-        return userData(data)
+      const snapshot = await usersRef.once('value')
+      const users = snapshot.val()
+      const keys = Object.keys(users)
+      const mapKeys = keys.map((key) => {
+        const user = users[key]
+        return userData(user, key)
       })
       return mapKeys
+    },
+    user: async (_, args) => {
+      const snapshot = await usersRef.child(args.id).once('value')
+      const user = snapshot.val()
+      console.log(user)
+      if (user) {
+        return userData(user, args.id)
+      }
+      return null
+    }
+  },
+  Mutation: {
+    createUser: async (_, args) => {
+      await usersRef.push({ 
+        name: args.name,
+        createdAt: new Date().getTime()
+       })
+      return 'User Added!'
+    },
+    updateUser: async (_, args) => {
+      const snapshot = await usersRef.child(args.id).once('value')
+      const user = snapshot.val()
+      if (user) {
+        await usersRef.child(args.id).update({ name: args.name })
+        return 'User Updated!'
+      }
+      throw new UserInputError('Invalid ID')
+    },
+    deleteUser: async (_, args) => {
+      const snapshot = await usersRef.child(args.id).once('value')
+      const user = snapshot.val()
+      if (user) {
+        await usersRef.child(args.id).remove()
+        return 'User deleted!'
+      }
+      throw new UserInputError('Invalid ID')
     }
   }
 }

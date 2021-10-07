@@ -1,6 +1,7 @@
-function userData(data) {
+function userData(data, id) {
   return {
-    id: data.id,
+    id,
+    createdAt: data.createdAt,
     name: data.name
   }
 }
