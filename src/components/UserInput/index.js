@@ -10,7 +10,8 @@ const UserInput = () => {
   const [onAddUser] = useMutation(CREATE_USER_MUTATION, {
     refetchQueries: [
       { query: USER_LIST_QUERY }
-    ]
+    ],
+    onCompleted: () => setName('')
   })
 
   const [name, setName] = useState('')
