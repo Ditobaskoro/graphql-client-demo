@@ -7,7 +7,7 @@ import {
 import Home from './components/Home'
 
 const client = new ApolloClient({
-  uri: 'http://localhost:4000/graphql',
+  uri: 'http://localhost:4000',
   cache: new InMemoryCache()
 });
 

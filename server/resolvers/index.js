@@ -20,7 +20,6 @@ const resolvers = {
     user: async (_, args) => {
       const snapshot = await usersRef.child(args.id).once('value')
       const user = snapshot.val()
-      console.log(user)
       if (user) {
         return userData(user, args.id)
       }
