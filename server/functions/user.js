@@ -1,7 +1,7 @@
 function userData(data, id) {
   return {
     id,
-    createdAt: data.createdAt,
+    createdAt: new Date(data.createdAt).toISOString(),
     name: data.name
   }
 }
